@@ -12,16 +12,16 @@ class BaseCar:
         self.car_type = car_type
         self.photo_file_name = photo_file_name
         self.brand = brand
-        self.carrying = carrying
+        self.carrying = float(carrying)
 
-    def get_photo_file_ext(self, car):
-        return os.path.splitext(car.photo_file_name)[1]
+    def get_photo_file_ext(self):
+        return os.path.splitext(self.photo_file_name)[1]
 
 
 class Car(BaseCar):
     def __init__(self, car_type, brand, photo_file_name, carrying, passenger_seats_count):
         super().__init__(car_type, brand, photo_file_name, carrying)
-        self.passenger_seats_count = passenger_seats_count
+        self.passenger_seats_count = int(passenger_seats_count)
 
 
 class Truck(BaseCar):
@@ -50,10 +50,18 @@ class SpecMachine(BaseCar):
 
 def get_car_list(csv_file):
     car_list = []
+    car_types = ["car", "truck", "spec_machine"]
     with open(csv_file, newline='') as csv_fd:
         reader = csv.DictReader(csv_fd, delimiter=';')
 #         next(reader)
         for row in reader:
+
+            if not row['photo_file_name']:
+                continue
+
+            if row['car_type'] not in car_types:
+                continue
+
             if row['car_type'] == 'car':
 
                 car = Car(row['car_type'], row['brand'], row['photo_file_name'], row['carrying'],
@@ -75,6 +83,4 @@ def get_car_list(csv_file):
         return car_list
 
 
-# print(get_car_list("/home/parshin/coursera/mail.ru-python/week3/coursera_week3_cars.csv"))
-for car in get_car_list("/home/parshin/coursera/mail.ru-python/week3/coursera_week3_cars.csv"):
-    print(car.__dict__)
+

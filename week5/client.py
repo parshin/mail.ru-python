@@ -18,6 +18,10 @@ class Client:
             try:
                 msg = 'put {} {} {}\n'.format(metric, value, str(int(timestamp)))
                 sock.sendall(msg.encode("utf-8"))
+                response = self.read_data(sock).decode('utf-8')
+                if response != 'ok\n\n':
+                    raise ClientError("error")
+
             except socket.timeout:
                 print("send data timeout")
             except socket.error as ex:
@@ -28,15 +32,44 @@ class Client:
             try:
                 msg = 'get {}\n'.format(key)
                 sock.sendall(msg.encode("utf-8"))
-                reply = self.read_data(socket)
+                response = self.read_data(sock).decode('utf-8')
+                if response == 'error\nwrong command\n\n':
+                    raise ClientError("error")
 
-                return {}
+                result = {}
+                str_list = response[3:-2:].splitlines()
+                for str_line in str_list:
+                    data = str_line.split(' ', 1)
+                    if key != '*' and key not in data:
+                        continue
+                    lst_metrics = data[1].split()
+                    metric = ()
+                    metrics_list = []
+                    if data[0] not in result:
+                        result[data[0]] = []
+                    zipped = zip(lst_metrics[:-1:2], lst_metrics[1::2])
+                    for imetric in zipped:
+                        cpu = float(imetric[0])
+                        timestamp = int(imetric[1])
+                        metrics_list.append(tuple((timestamp, cpu)))
+
+                        result[data[0]].append(tuple((timestamp, cpu)))
+
+                return result
+
             except socket.timeout:
-                print("send data timeout")
+                raise ClientError
             except socket.error as ex:
-                print("send data error:", ex)
+                raise ClientError
 
 
-class ClientError(Exception):
-    def __init__(self):
-        Exception.__init__(self)
+class ClientError(Exception, object):
+    def __init__(self, message):
+        self.message = message
+        super(ClientError, self).__init__(self.__str__())
+
+    def __repr__(self):
+        return "ClientError(error={error})".format(error=self.message)
+
+    def __str__(self):
+        return self.message

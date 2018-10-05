@@ -4,19 +4,34 @@ import asyncio
 class ClientServerProtocol(asyncio.Protocol):
     def connection_made(self, transport):
         self.transport = transport
+        self.storage = {}
 
     def data_received(self, data):
-        resp = process_data(data.decode())
+        resp = self.process_data(data.decode())
         self.transport.write(resp.encode())
 
-
-def process_data(data):
-    items = data.split()
-    print(items)
-    if 'put' in items:
-        return 'put\n'
-    else:
-        return 'ok\n\n'
+    def process_data(self, data):
+        command = data.split()
+        # print(f'command: {command}')
+        if command[0] == 'put':
+            key = command[1]
+            value = command[2]
+            timestamp = command[3]
+            if key not in self.storage:
+                self.storage[key] = []
+            self.storage[key].append((int(timestamp), float(value)))
+            return 'ok\n\n'
+        elif command[0] == 'get':
+            key = command[1]
+            if key == '*':
+                return str(self.storage)+'\n\n'
+            else:
+                if key in self.storage:
+                    return str(self.storage[key])+'\n\n'
+                else:
+                    return str({})+'\n\n'
+        else:
+            return 'error\nwrong\ncommand\n\n'
 
 
 def run_server(host, port):

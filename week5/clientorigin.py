@@ -76,6 +76,8 @@ class Client:
         # читаем ответ
         payload = self._read()
 
+        # print(f'payload: {payload}')
+
         data = {}
         if payload == "":
             return data

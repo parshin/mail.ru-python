@@ -2,9 +2,12 @@ import asyncio
 
 
 class ClientServerProtocol(asyncio.Protocol):
+
+    storage = {}
+
     def connection_made(self, transport):
         self.transport = transport
-        self.storage = {}
+        # self.storage = storage
 
     def data_received(self, data):
         resp = self.process_data(data.decode())
@@ -13,21 +16,37 @@ class ClientServerProtocol(asyncio.Protocol):
     def process_data(self, data):
         command = data.split()
         # print(f'command: {command}')
+
         if command[0] == 'put':
             key = command[1]
             value = command[2]
             timestamp = command[3]
             if key not in self.storage:
                 self.storage[key] = []
-            self.storage[key].append((int(timestamp), float(value)))
+
+            values = (int(timestamp), float(value))
+            if values not in self.storage[key]:
+                self.storage[key].append(values)
             return 'ok\n\n'
         elif command[0] == 'get':
             key = command[1]
+            rdata = 'ok'
             if key == '*':
-                return str(self.storage)+'\n\n'
+                # print(f'storage: {self.storage}')
+                for k, v in self.storage.items():
+                    for item in v:
+                        rdata = rdata + '\n'
+                        rdata = rdata + k + ' ' + str(item[1]) + ' ' + str(item[0])
+
+                # print(f'response*: {rdata}'+'\n\n')
+                return rdata+'\n\n'
             else:
                 if key in self.storage:
-                    return str(self.storage[key])+'\n\n'
+                    rdata = 'ok'
+                    for vals in self.storage[key]:
+                        rdata = rdata + '\n' + key + ' ' + str(vals[1]) + ' ' + str(vals[0])
+                    # print(f'responseK: {rdata}')
+                    return rdata + '\n\n'
                 else:
                     return str({})+'\n\n'
         else:
@@ -49,4 +68,5 @@ def run_server(host, port):
     loop.run_until_complete(server.wait_closed())
     loop.close()
 
-run_server('127.0.0.1', 8181)
+
+# run_server('127.0.0.1', 8181)

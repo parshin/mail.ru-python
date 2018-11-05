@@ -17,7 +17,7 @@ SELECT DISTINCT store_id FROM sale
 SELECT DISTINCT store_id FROM store WHERE store_id NOT IN (SELECT DISTINCT store_id FROM sale)
 
 -- 6. Получить для каждого товара название и среднюю стоимость единицы товара avg(total/quantity), если товар не продавался, он не попадает в отчет.
-SELECT p.name, avg(s.total/s.quantity) from sale as s left join product as p ON s.product_id = p.product_id GROUP BY p.name ORDER BY avg(s.total/s.quantity)
+SELECT p.name, avg(distinct s.total/s.quantity) from sale as s left join product as p ON s.product_id = p.product_id GROUP BY p.name
 
 -- 7. Получить названия всех продуктов, которые продавались только с единственного склада
 SELECT p.name from sale as s left join product as p ON s.product_id = p.product_id group by s.product_id having count(distinct s.store_id) = 1

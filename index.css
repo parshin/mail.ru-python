@@ -1,0 +1,19 @@
+
+
+html, body { padding: 10px; margin: 10px;}
+
+body { padding: 20px; }
+
+/*.nav-link {
+  color: red;
+}*/
+
+.btn { 
+	background-color: grey;
+	font-style: oblique
+
+}
+
+.container .col-4 {
+	font-style: italic;
+}

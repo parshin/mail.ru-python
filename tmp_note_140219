@@ -1,8 +1,0 @@
-# df.groupby(['Nationality'])['Name'].count
-data = df.groupby(['Nationality'])
-
-# df[df['Nationality'] == 'Portugal'].value_counts()
-data = df.groupby(['Nationality'])['Name'].count
-values = data['TOT_POP'].tolist()
-fips = data['FIPS'].tolist()
-data

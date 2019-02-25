@@ -1,6 +1,7 @@
-I've done 'Погружение в Python' course.
-https://www.coursera.org/account/accomplishments/records/FP5B6E4E4AJN
+Программирование на Python Specialization
 
+Moscow Institute of Physics and Technology
+Mail.Ru Group
+ФРОО
 
-I've done 'ООП и паттерны проектирования в Python' course.
-https://www.coursera.org/account/accomplishments/certificate/FTS448CL3VGJ
+https://www.coursera.org/specializations/programming-in-python
